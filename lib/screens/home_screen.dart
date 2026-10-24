@@ -2,10 +2,29 @@ import 'package:flutter/material.dart';
 
 import '../models/security_report.dart';
 import '../widgets/report_card.dart';
+import 'detail_screen.dart';
 
 /// Pantalla 1: listado principal de reportes de seguridad.
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
+
+  /// Navega a la Pantalla 2 enviando el reporte como parámetro y
+  /// espera (await) el resultado que devuelve Navigator.pop.
+  Future<void> _openDetail(BuildContext context, SecurityReport report) async {
+    final result = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DetailScreen(report: report),
+      ),
+    );
+
+    // Si el usuario volvió con un mensaje, se muestra en un SnackBar.
+    if (result != null && context.mounted) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(result)));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,9 +88,7 @@ class HomeScreen extends StatelessWidget {
                 final report = sampleReports[index];
                 return ReportCard(
                   report: report,
-                  onViewDetail: () {
-                    // TODO etapa 4: navegar a DetailScreen
-                  },
+                  onViewDetail: () => _openDetail(context, report),
                 );
               },
             ),
