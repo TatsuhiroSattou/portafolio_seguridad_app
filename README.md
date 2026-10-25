@@ -1,6 +1,6 @@
 # Security Portfolio (MVP en Flutter)
 
-Prototipo interactivo de un catálogo de **reportes de seguridad** basado en un portafolio de ciberseguridad ofensiva. Muestra únicamente información pública y de alto nivel (sin pasos de reproducción), siguiendo la práctica de divulgación responsable.
+Prototipo interactivo de un catálogo de **reportes de seguridad** basado en un portafolio de ciberseguridad ofensiva. Muestra únicamente información pública y de alto nivel que he divulgando a lo largo de estos meses para aportar conocimientos en bug bouting (sin pasos de reproducción), siguiendo la práctica de divulgación responsable.
 
 ## Características
 
