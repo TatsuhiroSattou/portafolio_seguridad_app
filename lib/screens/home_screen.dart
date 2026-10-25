@@ -77,6 +77,11 @@ class HomeScreen extends StatelessWidget {
                       ),
                   ],
                 ),
+                const SizedBox(height: 10),
+                Text(
+                  '${sampleReports.length} reportes · divulgación responsable',
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                ),
               ],
             ),
           ),
