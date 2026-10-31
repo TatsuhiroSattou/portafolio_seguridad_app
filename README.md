@@ -25,6 +25,7 @@ Icono y *splash screen* propios generados desde `assets/branding/` con `flutter_
 | Cámara, galería y permisos | Pide el permiso de cámara en tiempo de ejecución y maneja los casos concedido, denegado y bloqueado. | [`permission_service.dart`](lib/services/permission_service.dart), [`evidence_provider.dart`](lib/providers/evidence_provider.dart) |
 | Recorte y compresión | La foto se recorta en cuadrado y se comprime a JPEG en un *isolate* (sin congelar la interfaz). | [`image_service.dart`](lib/services/image_service.dart) |
 | Notificaciones locales | Canal nativo de Android y soporte iOS para alertas locales. | [`notification_service.dart`](lib/services/notification_service.dart) |
+| Eventos del sistema | Cambios de red, envíos y evidencias disparan notificaciones sin acoplar los módulos. | [`system_events_coordinator.dart`](lib/services/system_events_coordinator.dart) |
 
 ## Instalación y ejecución
 

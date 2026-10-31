@@ -12,6 +12,7 @@ import 'services/connectivity_service.dart';
 import 'services/image_service.dart';
 import 'services/notification_service.dart';
 import 'services/permission_service.dart';
+import 'services/system_events_coordinator.dart';
 import 'widgets/offline_banner.dart';
 
 Future<void> main() async {
@@ -36,11 +37,25 @@ class BugTatsuApp extends StatelessWidget {
           create: (context) =>
               ConnectivityProvider(context.read<ConnectivityService>()),
         ),
+        Provider<SystemEventsCoordinator>(
+          lazy: false,
+          create: (context) => SystemEventsCoordinator(
+            connectivity: context.read<ConnectivityProvider>(),
+            notifications: notifications,
+          ),
+          dispose: (_, coordinator) => coordinator.dispose(),
+        ),
         Provider<RequestsRepository>(create: (_) => RequestsRepository()),
         ChangeNotifierProxyProvider<ConnectivityProvider, RequestsProvider>(
           lazy: false,
           create: (context) => RequestsProvider(
             context.read<RequestsRepository>(),
+            onSynced: (count) => notifications.show(
+              title: 'Solicitudes enviadas',
+              body: count == 1
+                  ? 'Se envió 1 solicitud pendiente.'
+                  : 'Se enviaron $count solicitudes pendientes.',
+            ),
           ),
           update: (context, connectivity, requests) {
             requests!.updateConnectivity(
@@ -57,6 +72,10 @@ class BugTatsuApp extends StatelessWidget {
             permissions: context.read<PermissionService>(),
             images: context.read<ImageService>(),
             repository: context.read<EvidenceRepository>(),
+            onEvidenceReady: (message) => notifications.show(
+              title: 'Evidencia lista',
+              body: message,
+            ),
           ),
         ),
       ],
