@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
 
+import '../core/app_theme.dart';
 import '../models/security_report.dart';
 import '../widgets/report_card.dart';
 import 'detail_screen.dart';
 
 /// Pantalla 1: listado principal de reportes de seguridad.
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   /// Navega a la Pantalla 2 enviando el reporte como parámetro y
   /// espera (await) el resultado que devuelve Navigator.pop.
-  Future<void> _openDetail(BuildContext context, SecurityReport report) async {
+  Future<void> _openDetail(SecurityReport report) async {
     final result = await Navigator.push<String>(
       context,
       MaterialPageRoute(
@@ -18,8 +24,7 @@ class HomeScreen extends StatelessWidget {
       ),
     );
 
-    // Si el usuario volvió con un mensaje, se muestra en un SnackBar.
-    if (result != null && context.mounted) {
+    if (result != null && mounted) {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(SnackBar(content: Text(result)));
@@ -30,9 +35,13 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Security Portfolio'),
+        title: const Text('BugTatsu Sec'),
+        backgroundColor: AppColors.background,
+        foregroundColor: AppColors.primary,
         centerTitle: true,
-        leading: const Icon(Icons.shield),
+        leading: const Icon(Icons.shield_outlined),
+        actions: [
+        ],
       ),
       body: Column(
         children: [
@@ -40,18 +49,18 @@ class HomeScreen extends StatelessWidget {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
-            color: const Color(0xFF010409),
+            color: const Color(0xFF070C16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  r'victor@security-portfolio:~$ whoami',
-                  style: TextStyle(color: Colors.greenAccent, fontSize: 13),
+                  r'bugtatsu@sec:~$ whoami',
+                  style: TextStyle(color: AppColors.primary, fontSize: 13),
                 ),
                 const SizedBox(height: 6),
                 const Row(
                   children: [
-                    Icon(Icons.bug_report, size: 28),
+                    Icon(Icons.bug_report, size: 28, color: AppColors.secondary),
                     SizedBox(width: 10),
                     Expanded(
                       child: Text(
@@ -73,27 +82,36 @@ class HomeScreen extends StatelessWidget {
                       Chip(
                         label: Text(cert, style: const TextStyle(fontSize: 11)),
                         visualDensity: VisualDensity.compact,
-                        avatar: const Icon(Icons.verified, size: 14),
+                        backgroundColor: AppColors.surface,
+                        side: const BorderSide(color: AppColors.border),
+                        avatar: const Icon(
+                          Icons.verified,
+                          size: 14,
+                          color: AppColors.primary,
+                        ),
                       ),
                   ],
                 ),
                 const SizedBox(height: 10),
                 Text(
                   '${sampleReports.length} reportes · divulgación responsable',
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textMuted,
+                  ),
                 ),
               ],
             ),
           ),
           Expanded(
             child: ListView.builder(
-              padding: const EdgeInsets.only(top: 8, bottom: 16),
+              padding: const EdgeInsets.only(top: 8, bottom: 88),
               itemCount: sampleReports.length,
               itemBuilder: (context, index) {
                 final report = sampleReports[index];
                 return ReportCard(
                   report: report,
-                  onViewDetail: () => _openDetail(context, report),
+                  onViewDetail: () => _openDetail(report),
                 );
               },
             ),
@@ -103,3 +121,4 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
+

@@ -1,44 +1,30 @@
-# Security Portfolio (MVP en Flutter)
+# BugTatsu Sec
 
+<<<<<<< HEAD
 Prototipo interactivo de un catálogo de **reportes de seguridad** basado en un portafolio de ciberseguridad ofensiva. Muestra únicamente información pública y de alto nivel que he divulgando a lo largo de estos meses para aportar conocimientos en bug bouting (sin pasos de reproducción), siguiendo la práctica de divulgación responsable.
+=======
+Aplicación móvil en Flutter de **BugTatsu Sec**, la versión móvil de mi portafolio de ciberseguridad ofensiva ([portafolio.bugtatsu.xyz](https://portafolio.bugtatsu.xyz)). Muestra reportes de seguridad en formato de catálogo, únicamente con información pública y de alto nivel (sin pasos de reproducción), siguiendo la práctica de divulgación responsable.
+>>>>>>> 1bdbed2 (feat(brand): rebranding a BugTatsu Sec con paquete com.bugtatsu.sec y tema unificado)
 
-## Características
+Es la evolución de la Actividad Integradora 1 (*Security Portfolio*): se aplicó un rebranding completo y se agregaron servicios nativos.
 
-- **Pantalla 1 (HomeScreen):** encabezado estilo terminal con certificaciones y listado de reportes en tarjetas (`Card`) con imagen, organización, severidad, estado y botón "Ver detalle".
-- **Pantalla 2 (DetailScreen):** detalle del reporte (tipo, descripción, impacto) y formulario de contacto con nombre validado y motivo seleccionable.
-- **Navegación ida y vuelta:** `Navigator.push` / `Navigator.pop`.
-- **Paso de parámetros:** el objeto `SecurityReport` viaja de la Pantalla 1 a la Pantalla 2 por constructor; al volver, la Pantalla 2 devuelve un mensaje que se muestra en un `SnackBar`.
+## Identidad del proyecto
 
-## Estructura del proyecto
+| | |
+|---|---|
+| Nombre comercial | **BugTatsu Sec** |
+| Android `applicationId` | `com.bugtatsu.sec` |
+| iOS bundle identifier | `com.bugtatsu.sec` |
+| Gestor de estado | Provider |
+| Tema | Oscuro tipo terminal (`lib/core/app_theme.dart`) |
 
-```
-assets/
-└── images/            # banners locales de cada reporte
-lib/
-├── main.dart
-├── models/
-│   └── security_report.dart
-├── screens/
-│   ├── home_screen.dart
-│   └── detail_screen.dart
-└── widgets/
-    ├── report_card.dart
-    └── severity_chip.dart
-```
+## Instalación y ejecución
 
-## Cómo ejecutarlo
+Requisitos: Flutter estable, Android Studio con un emulador (o un dispositivo físico) y `flutter doctor -v` sin errores.
 
 ```bash
+git clone https://github.com/TatsuhiroSattou/portafolio_seguridad_app.git
+cd portafolio_seguridad_app
 flutter pub get
 flutter run
 ```
-
-## Verificación del entorno
-
-```bash
-flutter doctor -v
-```
-
-## Autor
-
-Victor Andre Chiquito Toro 

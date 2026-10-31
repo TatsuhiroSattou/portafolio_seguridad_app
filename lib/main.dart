@@ -1,32 +1,25 @@
 import 'package:flutter/material.dart';
 
+import 'core/app_theme.dart';
 import 'screens/home_screen.dart';
 
 void main() {
-  runApp(const PortafolioApp());
+  runApp(const BugTatsuApp());
 }
 
-class PortafolioApp extends StatelessWidget {
-  const PortafolioApp({super.key});
+class BugTatsuApp extends StatelessWidget {
+  const BugTatsuApp({super.key});
 
   @override
   Widget build(BuildContext context) {
+    return _buildApp();
+  }
+
+  Widget _buildApp() {
     return MaterialApp(
-      title: 'Security Portfolio',
+      title: 'BugTatsu Sec',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.dark,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.green,
-          brightness: Brightness.dark,
-        ),
-        scaffoldBackgroundColor: const Color(0xFF0D1117),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF010409),
-          foregroundColor: Colors.greenAccent,
-        ),
-      ),
+      theme: AppTheme.dark,
       home: const HomeScreen(),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../core/app_theme.dart';
 import '../models/security_report.dart';
 import 'severity_chip.dart';
 
@@ -20,12 +21,12 @@ class ReportCard extends StatelessWidget {
 
     return Card(
       elevation: 3,
-      color: const Color(0xFF161B22),
+      color: AppColors.surface,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: Color(0xFF30363D)),
+        side: const BorderSide(color: AppColors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,8 +39,12 @@ class ReportCard extends StatelessWidget {
             errorBuilder: (context, error, stackTrace) => Container(
               height: 130,
               width: double.infinity,
-              color: const Color(0xFF21262D),
-              child: const Icon(Icons.security, size: 48, color: Colors.green),
+              color: AppColors.border,
+              child: const Icon(
+                Icons.security,
+                size: 48,
+                color: AppColors.primary,
+              ),
             ),
           ),
           Padding(
@@ -51,7 +56,7 @@ class ReportCard extends StatelessWidget {
                   report.organization,
                   style: const TextStyle(
                     fontSize: 13,
-                    color: Colors.greenAccent,
+                    color: AppColors.primary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -71,7 +76,7 @@ class ReportCard extends StatelessWidget {
                     Icon(
                       resolved ? Icons.check_circle : Icons.hourglass_top,
                       size: 18,
-                      color: resolved ? Colors.green : Colors.amber,
+                      color: resolved ? AppColors.success : AppColors.warning,
                     ),
                     const SizedBox(width: 4),
                     Text(report.status),

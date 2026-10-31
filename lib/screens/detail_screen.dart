@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../core/app_theme.dart';
 import '../models/security_report.dart';
 import '../widgets/severity_chip.dart';
 
@@ -31,15 +32,17 @@ class _DetailScreenState extends State<DetailScreen> {
     super.dispose();
   }
 
-  void _submit() {
-    if (_formKey.currentState!.validate()) {
-      // Regresa a la Pantalla 1 devolviendo un mensaje (vuelta).
-      Navigator.pop(
-        context,
-        'Solicitud de ${_nameController.text.trim()} ($_reason) '
-        'sobre el reporte de ${widget.report.organization}.',
-      );
-    }
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final name = _nameController.text.trim();
+    final report = widget.report;
+
+    // Regresa a la Pantalla 1 devolviendo un mensaje (vuelta).
+    Navigator.pop(
+      context,
+      'Solicitud de $name ($_reason) sobre el reporte de ${report.organization}.',
+    );
   }
 
   @override
@@ -47,7 +50,11 @@ class _DetailScreenState extends State<DetailScreen> {
     final report = widget.report;
 
     return Scaffold(
-      appBar: AppBar(title: Text(report.organization)),
+      appBar: AppBar(
+        title: Text(report.organization),
+        backgroundColor: AppColors.background,
+        foregroundColor: AppColors.primary,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -63,8 +70,12 @@ class _DetailScreenState extends State<DetailScreen> {
                 errorBuilder: (context, error, stackTrace) => Container(
                   height: 180,
                   width: double.infinity,
-                  color: const Color(0xFF21262D),
-                  child: const Icon(Icons.security, size: 56, color: Colors.green),
+                  color: AppColors.border,
+                  child: const Icon(
+                    Icons.security,
+                    size: 56,
+                    color: AppColors.primary,
+                  ),
                 ),
               ),
             ),
@@ -81,7 +92,8 @@ class _DetailScreenState extends State<DetailScreen> {
                 Icon(
                   report.isResolved ? Icons.check_circle : Icons.hourglass_top,
                   size: 18,
-                  color: report.isResolved ? Colors.green : Colors.amber,
+                  color:
+                      report.isResolved ? AppColors.success : AppColors.warning,
                 ),
                 const SizedBox(width: 4),
                 Text(report.status),
@@ -90,12 +102,24 @@ class _DetailScreenState extends State<DetailScreen> {
             const SizedBox(height: 6),
             Text(
               'ID de reporte: #${report.id}',
-              style: const TextStyle(color: Colors.grey),
+              style: const TextStyle(color: AppColors.textMuted),
             ),
             const SizedBox(height: 14),
-            _InfoRow(icon: Icons.bug_report, label: 'Tipo', value: report.vulnType),
-            _InfoRow(icon: Icons.description, label: 'Descripción', value: report.description),
-            _InfoRow(icon: Icons.priority_high, label: 'Impacto', value: report.impact),
+            _InfoRow(
+              icon: Icons.bug_report,
+              label: 'Tipo',
+              value: report.vulnType,
+            ),
+            _InfoRow(
+              icon: Icons.description,
+              label: 'Descripción',
+              value: report.description,
+            ),
+            _InfoRow(
+              icon: Icons.priority_high,
+              label: 'Impacto',
+              value: report.impact,
+            ),
             const Divider(height: 32),
             const Text(
               'Contactar sobre este reporte',
@@ -182,7 +206,7 @@ class _InfoRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 20, color: Colors.greenAccent),
+          Icon(icon, size: 20, color: AppColors.primary),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -192,7 +216,7 @@ class _InfoRow extends StatelessWidget {
                   label,
                   style: const TextStyle(
                     fontSize: 12,
-                    color: Colors.grey,
+                    color: AppColors.textMuted,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

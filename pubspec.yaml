@@ -1,7 +1,7 @@
-name: portafolio_seguridad_app
-description: "MVP de portafolio de ciberseguridad: catálogo de reportes de seguridad en Flutter."
+name: bugtatsu_sec
+description: "BugTatsu Sec: portafolio móvil de ciberseguridad con servicios nativos (red, cámara y notificaciones)."
 publish_to: 'none'
-version: 1.0.0+1
+version: 2.0.0+2
 
 environment:
   sdk: ^3.0.0
@@ -21,3 +21,4 @@ flutter:
 
   assets:
     - assets/images/
+
