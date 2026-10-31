@@ -10,30 +10,52 @@ import 'repositories/evidence_repository.dart';
 import 'screens/home_screen.dart';
 import 'services/connectivity_service.dart';
 import 'services/image_service.dart';
+import 'services/notification_service.dart';
 import 'services/permission_service.dart';
+import 'services/system_events_coordinator.dart';
 import 'widgets/offline_banner.dart';
 
-void main() {
-  runApp(const BugTatsuApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final notifications = NotificationService();
+  await notifications.init();
+  runApp(BugTatsuApp(notifications: notifications));
 }
 
 class BugTatsuApp extends StatelessWidget {
-  const BugTatsuApp({super.key});
+  const BugTatsuApp({super.key, required this.notifications});
+
+  final NotificationService notifications;
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        Provider<NotificationService>.value(value: notifications),
         Provider<ConnectivityService>(create: (_) => ConnectivityService()),
         ChangeNotifierProvider<ConnectivityProvider>(
           create: (context) =>
               ConnectivityProvider(context.read<ConnectivityService>()),
+        ),
+        Provider<SystemEventsCoordinator>(
+          lazy: false,
+          create: (context) => SystemEventsCoordinator(
+            connectivity: context.read<ConnectivityProvider>(),
+            notifications: notifications,
+          ),
+          dispose: (_, coordinator) => coordinator.dispose(),
         ),
         Provider<RequestsRepository>(create: (_) => RequestsRepository()),
         ChangeNotifierProxyProvider<ConnectivityProvider, RequestsProvider>(
           lazy: false,
           create: (context) => RequestsProvider(
             context.read<RequestsRepository>(),
+            onSynced: (count) => notifications.show(
+              title: 'Solicitudes enviadas',
+              body: count == 1
+                  ? 'Se envió 1 solicitud pendiente.'
+                  : 'Se enviaron $count solicitudes pendientes.',
+            ),
           ),
           update: (context, connectivity, requests) {
             requests!.updateConnectivity(
@@ -50,6 +72,10 @@ class BugTatsuApp extends StatelessWidget {
             permissions: context.read<PermissionService>(),
             images: context.read<ImageService>(),
             repository: context.read<EvidenceRepository>(),
+            onEvidenceReady: (message) => notifications.show(
+              title: 'Evidencia lista',
+              body: message,
+            ),
           ),
         ),
       ],

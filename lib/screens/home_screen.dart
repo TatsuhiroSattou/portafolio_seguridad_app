@@ -5,6 +5,7 @@ import '../core/app_theme.dart';
 import '../models/security_report.dart';
 import '../providers/connectivity_provider.dart';
 import '../providers/requests_provider.dart';
+import '../services/notification_service.dart';
 import '../widgets/report_card.dart';
 import 'detail_screen.dart';
 import 'evidence_screen.dart';
@@ -19,6 +20,37 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Pide el permiso de notificaciones (Android 13+) tras dibujar la primera pantalla.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<NotificationService>().requestPermission();
+    });
+  }
+
+  Future<void> _testNotification() async {
+    final notifications = context.read<NotificationService>();
+    final granted = await notifications.requestPermission();
+    if (!mounted) return;
+
+    if (!granted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Activa las notificaciones de BugTatsu Sec en los ajustes del sistema.',
+          ),
+        ),
+      );
+      return;
+    }
+    await notifications.show(
+      title: 'BugTatsu Sec',
+      body: 'Notificación local de prueba.',
+    );
+  }
+
   /// Navega a la Pantalla 2 enviando el reporte como parámetro y
   /// espera (await) el resultado que devuelve Navigator.pop.
   Future<void> _openDetail(SecurityReport report) async {
@@ -48,6 +80,11 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           const _ConnectionIndicator(),
           const _OutboxButton(),
+          IconButton(
+            tooltip: 'Probar notificación',
+            icon: const Icon(Icons.notifications_active_outlined),
+            onPressed: _testNotification,
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
