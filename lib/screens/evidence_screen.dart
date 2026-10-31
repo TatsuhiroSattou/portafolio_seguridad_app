@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../core/app_theme.dart';
 import '../providers/evidence_provider.dart';
+import '../services/image_service.dart';
 
 /// Pantalla de evidencia: cámara/galería con permisos en tiempo de ejecución.
 class EvidenceScreen extends StatelessWidget {
@@ -26,12 +27,14 @@ class EvidenceScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         children: [
           const Text(
-            'Adjunta una captura como evidencia desde la cámara o la galería.',
+            'Adjunta una captura como evidencia. La imagen se recorta en '
+            'formato cuadrado y se comprime antes de guardarse.',
             style: TextStyle(color: AppColors.textMuted),
           ),
           const SizedBox(height: 16),
           _Preview(file: evidence.imageFile),
           const SizedBox(height: 12),
+          if (evidence.result != null) _Stats(result: evidence.result!),
           if (busy)
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 12),
@@ -89,6 +92,40 @@ class _Preview extends StatelessWidget {
                 ),
               )
             : Image.file(image, fit: BoxFit.cover),
+      ),
+    );
+  }
+}
+
+class _Stats extends StatelessWidget {
+  final ProcessedImage result;
+
+  const _Stats({required this.result});
+
+  String _formatBytes(int bytes) {
+    if (bytes < 1024) return '$bytes B';
+    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
+    return '${(bytes / (1024 * 1024)).toStringAsFixed(2)} MB';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Original: ${_formatBytes(result.originalBytes)}'),
+          Text('Comprimida: ${_formatBytes(result.finalBytes)}'),
+          Text('Ahorro: ${result.savedPercent}%'),
+          Text('Dimensiones: ${result.width} x ${result.height} px'),
+        ],
       ),
     );
   }

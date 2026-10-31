@@ -6,6 +6,7 @@ import 'providers/connectivity_provider.dart';
 import 'providers/evidence_provider.dart';
 import 'providers/requests_provider.dart';
 import 'repositories/requests_repository.dart';
+import 'repositories/evidence_repository.dart';
 import 'screens/home_screen.dart';
 import 'services/connectivity_service.dart';
 import 'services/image_service.dart';
@@ -43,10 +44,12 @@ class BugTatsuApp extends StatelessWidget {
         ),
         Provider<PermissionService>(create: (_) => PermissionService()),
         Provider<ImageService>(create: (_) => ImageService()),
+        Provider<EvidenceRepository>(create: (_) => EvidenceRepository()),
         ChangeNotifierProvider<EvidenceProvider>(
           create: (context) => EvidenceProvider(
             permissions: context.read<PermissionService>(),
             images: context.read<ImageService>(),
+            repository: context.read<EvidenceRepository>(),
           ),
         ),
       ],

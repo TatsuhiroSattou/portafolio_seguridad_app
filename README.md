@@ -23,6 +23,7 @@ Icono y *splash screen* propios generados desde `assets/branding/` con `flutter_
 | Conectividad | Detecta en tiempo real si hay internet (Stream) y muestra un banner *offline* sobre cualquier pantalla. | [`connectivity_service.dart`](lib/services/connectivity_service.dart), [`offline_banner.dart`](lib/widgets/offline_banner.dart) |
 | Caché local | Las solicitudes de contacto se guardan primero en el dispositivo y se envían al recuperar la conexión. | [`requests_repository.dart`](lib/repositories/requests_repository.dart), [`requests_provider.dart`](lib/providers/requests_provider.dart) |
 | Cámara, galería y permisos | Pide el permiso de cámara en tiempo de ejecución y maneja los casos concedido, denegado y bloqueado. | [`permission_service.dart`](lib/services/permission_service.dart), [`evidence_provider.dart`](lib/providers/evidence_provider.dart) |
+| Recorte y compresión | La foto se recorta en cuadrado y se comprime a JPEG en un *isolate* (sin congelar la interfaz). | [`image_service.dart`](lib/services/image_service.dart) |
 
 ## Instalación y ejecución
 
