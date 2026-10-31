@@ -7,6 +7,7 @@ import '../providers/connectivity_provider.dart';
 import '../providers/requests_provider.dart';
 import '../widgets/report_card.dart';
 import 'detail_screen.dart';
+import 'evidence_screen.dart';
 import 'outbox_screen.dart';
 
 /// Pantalla 1: listado principal de reportes de seguridad.
@@ -48,6 +49,14 @@ class _HomeScreenState extends State<HomeScreen> {
           const _ConnectionIndicator(),
           const _OutboxButton(),
         ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const EvidenceScreen()),
+        ),
+        icon: const Icon(Icons.photo_camera_outlined),
+        label: const Text('Evidencia'),
       ),
       body: Column(
         children: [
