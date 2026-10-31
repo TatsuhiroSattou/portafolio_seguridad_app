@@ -3,10 +3,14 @@ import 'package:provider/provider.dart';
 
 import 'core/app_theme.dart';
 import 'providers/connectivity_provider.dart';
+import 'providers/evidence_provider.dart';
 import 'providers/requests_provider.dart';
 import 'repositories/requests_repository.dart';
+import 'repositories/evidence_repository.dart';
 import 'screens/home_screen.dart';
 import 'services/connectivity_service.dart';
+import 'services/image_service.dart';
+import 'services/permission_service.dart';
 import 'widgets/offline_banner.dart';
 
 void main() {
@@ -37,6 +41,16 @@ class BugTatsuApp extends StatelessWidget {
             );
             return requests;
           },
+        ),
+        Provider<PermissionService>(create: (_) => PermissionService()),
+        Provider<ImageService>(create: (_) => ImageService()),
+        Provider<EvidenceRepository>(create: (_) => EvidenceRepository()),
+        ChangeNotifierProvider<EvidenceProvider>(
+          create: (context) => EvidenceProvider(
+            permissions: context.read<PermissionService>(),
+            images: context.read<ImageService>(),
+            repository: context.read<EvidenceRepository>(),
+          ),
         ),
       ],
       child: _buildApp(),
