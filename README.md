@@ -24,6 +24,7 @@ Icono y *splash screen* propios generados desde `assets/branding/` con `flutter_
 | Caché local | Las solicitudes de contacto se guardan primero en el dispositivo y se envían al recuperar la conexión. | [`requests_repository.dart`](lib/repositories/requests_repository.dart), [`requests_provider.dart`](lib/providers/requests_provider.dart) |
 | Cámara, galería y permisos | Pide el permiso de cámara en tiempo de ejecución y maneja los casos concedido, denegado y bloqueado. | [`permission_service.dart`](lib/services/permission_service.dart), [`evidence_provider.dart`](lib/providers/evidence_provider.dart) |
 | Recorte y compresión | La foto se recorta en cuadrado y se comprime a JPEG en un *isolate* (sin congelar la interfaz). | [`image_service.dart`](lib/services/image_service.dart) |
+| Notificaciones locales | Canal nativo de Android y soporte iOS para alertas locales. | [`notification_service.dart`](lib/services/notification_service.dart) |
 
 ## Instalación y ejecución
 
@@ -37,3 +38,5 @@ dart run flutter_launcher_icons
 dart run flutter_native_splash:create
 flutter run
 ```
+
+> En Android 13 o superior la app pide el permiso de notificaciones al abrirse. En Android, el permiso de cámara se solicita al pulsar **Tomar foto**.
