@@ -4,8 +4,10 @@ import 'package:provider/provider.dart';
 import '../core/app_theme.dart';
 import '../models/security_report.dart';
 import '../providers/connectivity_provider.dart';
+import '../providers/requests_provider.dart';
 import '../widgets/report_card.dart';
 import 'detail_screen.dart';
+import 'outbox_screen.dart';
 
 /// Pantalla 1: listado principal de reportes de seguridad.
 class HomeScreen extends StatefulWidget {
@@ -44,6 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
         leading: const Icon(Icons.shield_outlined),
         actions: [
           const _ConnectionIndicator(),
+          const _OutboxButton(),
         ],
       ),
       body: Column(
@@ -147,3 +150,26 @@ class _ConnectionIndicator extends StatelessWidget {
   }
 }
 
+/// Botón con insignia que muestra cuántas solicitudes están pendientes de envío.
+class _OutboxButton extends StatelessWidget {
+  const _OutboxButton();
+
+  @override
+  Widget build(BuildContext context) {
+    final pending = context.select<RequestsProvider, int>(
+      (provider) => provider.pendingCount,
+    );
+    return IconButton(
+      tooltip: 'Solicitudes',
+      icon: Badge(
+        label: Text('$pending'),
+        isLabelVisible: pending > 0,
+        child: const Icon(Icons.outbox_outlined),
+      ),
+      onPressed: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const OutboxScreen()),
+      ),
+    );
+  }
+}

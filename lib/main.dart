@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 
 import 'core/app_theme.dart';
 import 'providers/connectivity_provider.dart';
+import 'providers/requests_provider.dart';
+import 'repositories/requests_repository.dart';
 import 'screens/home_screen.dart';
 import 'services/connectivity_service.dart';
 import 'widgets/offline_banner.dart';
@@ -22,6 +24,19 @@ class BugTatsuApp extends StatelessWidget {
         ChangeNotifierProvider<ConnectivityProvider>(
           create: (context) =>
               ConnectivityProvider(context.read<ConnectivityService>()),
+        ),
+        Provider<RequestsRepository>(create: (_) => RequestsRepository()),
+        ChangeNotifierProxyProvider<ConnectivityProvider, RequestsProvider>(
+          lazy: false,
+          create: (context) => RequestsProvider(
+            context.read<RequestsRepository>(),
+          ),
+          update: (context, connectivity, requests) {
+            requests!.updateConnectivity(
+              connectivity.isReady && connectivity.isOnline,
+            );
+            return requests;
+          },
         ),
       ],
       child: _buildApp(),
