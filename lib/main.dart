@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'core/app_theme.dart';
+import 'providers/connectivity_provider.dart';
 import 'screens/home_screen.dart';
+import 'services/connectivity_service.dart';
+import 'widgets/offline_banner.dart';
 
 void main() {
   runApp(const BugTatsuApp());
@@ -12,7 +16,16 @@ class BugTatsuApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _buildApp();
+    return MultiProvider(
+      providers: [
+        Provider<ConnectivityService>(create: (_) => ConnectivityService()),
+        ChangeNotifierProvider<ConnectivityProvider>(
+          create: (context) =>
+              ConnectivityProvider(context.read<ConnectivityService>()),
+        ),
+      ],
+      child: _buildApp(),
+    );
   }
 
   Widget _buildApp() {
@@ -20,6 +33,8 @@ class BugTatsuApp extends StatelessWidget {
       title: 'BugTatsu Sec',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.dark,
+      builder: (context, child) =>
+          OfflineBannerHost(child: child ?? const SizedBox.shrink()),
       home: const HomeScreen(),
     );
   }

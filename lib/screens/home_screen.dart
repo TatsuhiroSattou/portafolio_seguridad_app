@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../core/app_theme.dart';
 import '../models/security_report.dart';
+import '../providers/connectivity_provider.dart';
 import '../widgets/report_card.dart';
 import 'detail_screen.dart';
 
@@ -41,6 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
         centerTitle: true,
         leading: const Icon(Icons.shield_outlined),
         actions: [
+          const _ConnectionIndicator(),
         ],
       ),
       body: Column(
@@ -117,6 +120,28 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Ícono de estado de red en la AppBar (se actualiza solo).
+class _ConnectionIndicator extends StatelessWidget {
+  const _ConnectionIndicator();
+
+  @override
+  Widget build(BuildContext context) {
+    final online = context.select<ConnectivityProvider, bool>(
+      (provider) => provider.isOnline,
+    );
+    return Tooltip(
+      message: online ? 'En línea' : 'Sin conexión',
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Icon(
+          online ? Icons.wifi : Icons.wifi_off,
+          color: online ? AppColors.success : AppColors.warning,
+        ),
       ),
     );
   }

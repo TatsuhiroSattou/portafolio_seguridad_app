@@ -16,6 +16,12 @@ Es la evolución de la Actividad Integradora 1 (*Security Portfolio*): se aplic�
 
 Icono y *splash screen* propios generados desde `assets/branding/` con `flutter_launcher_icons` y `flutter_native_splash`.
 
+## Servicios nativos
+
+| Servicio | Qué hace | Código |
+|---|---|---|
+| Conectividad | Detecta en tiempo real si hay internet (Stream) y muestra un banner *offline* sobre cualquier pantalla. | [`connectivity_service.dart`](lib/services/connectivity_service.dart), [`offline_banner.dart`](lib/widgets/offline_banner.dart) |
+
 ## Instalación y ejecución
 
 Requisitos: Flutter estable, Android Studio con un emulador (o un dispositivo físico) y `flutter doctor -v` sin errores.
