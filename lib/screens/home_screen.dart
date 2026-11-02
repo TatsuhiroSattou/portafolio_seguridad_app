@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../core/app_theme.dart';
 import '../models/security_report.dart';
+import '../providers/connectivity_provider.dart';
+import '../providers/requests_provider.dart';
+import '../services/notification_service.dart';
 import '../widgets/report_card.dart';
 import 'detail_screen.dart';
+import 'evidence_screen.dart';
+import 'outbox_screen.dart';
 
 /// Pantalla 1: listado principal de reportes de seguridad.
 class HomeScreen extends StatefulWidget {
@@ -14,6 +20,37 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Pide el permiso de notificaciones (Android 13+) tras dibujar la primera pantalla.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<NotificationService>().requestPermission();
+    });
+  }
+
+  Future<void> _testNotification() async {
+    final notifications = context.read<NotificationService>();
+    final granted = await notifications.requestPermission();
+    if (!mounted) return;
+
+    if (!granted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Activa las notificaciones de BugTatsu Sec en los ajustes del sistema.',
+          ),
+        ),
+      );
+      return;
+    }
+    await notifications.show(
+      title: 'BugTatsu Sec',
+      body: 'Notificación local de prueba.',
+    );
+  }
+
   /// Navega a la Pantalla 2 enviando el reporte como parámetro y
   /// espera (await) el resultado que devuelve Navigator.pop.
   Future<void> _openDetail(SecurityReport report) async {
@@ -41,7 +78,22 @@ class _HomeScreenState extends State<HomeScreen> {
         centerTitle: true,
         leading: const Icon(Icons.shield_outlined),
         actions: [
+          const _ConnectionIndicator(),
+          const _OutboxButton(),
+          IconButton(
+            tooltip: 'Probar notificación',
+            icon: const Icon(Icons.notifications_active_outlined),
+            onPressed: _testNotification,
+          ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const EvidenceScreen()),
+        ),
+        icon: const Icon(Icons.photo_camera_outlined),
+        label: const Text('Evidencia'),
       ),
       body: Column(
         children: [
@@ -122,3 +174,48 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
+/// Ícono de estado de red en la AppBar (se actualiza solo).
+class _ConnectionIndicator extends StatelessWidget {
+  const _ConnectionIndicator();
+
+  @override
+  Widget build(BuildContext context) {
+    final online = context.select<ConnectivityProvider, bool>(
+      (provider) => provider.isOnline,
+    );
+    return Tooltip(
+      message: online ? 'En línea' : 'Sin conexión',
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Icon(
+          online ? Icons.wifi : Icons.wifi_off,
+          color: online ? AppColors.success : AppColors.warning,
+        ),
+      ),
+    );
+  }
+}
+
+/// Botón con insignia que muestra cuántas solicitudes están pendientes de envío.
+class _OutboxButton extends StatelessWidget {
+  const _OutboxButton();
+
+  @override
+  Widget build(BuildContext context) {
+    final pending = context.select<RequestsProvider, int>(
+      (provider) => provider.pendingCount,
+    );
+    return IconButton(
+      tooltip: 'Solicitudes',
+      icon: Badge(
+        label: Text('$pending'),
+        isLabelVisible: pending > 0,
+        child: const Icon(Icons.outbox_outlined),
+      ),
+      onPressed: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const OutboxScreen()),
+      ),
+    );
+  }
+}
