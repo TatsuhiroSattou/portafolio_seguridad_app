@@ -7,6 +7,7 @@ import '../providers/connectivity_provider.dart';
 import '../providers/requests_provider.dart';
 import '../services/notification_service.dart';
 import '../widgets/report_card.dart';
+import 'breaches_screen.dart';
 import 'detail_screen.dart';
 import 'evidence_screen.dart';
 import 'outbox_screen.dart';
@@ -79,6 +80,14 @@ class _HomeScreenState extends State<HomeScreen> {
         leading: const Icon(Icons.shield_outlined),
         actions: [
           const _ConnectionIndicator(),
+          IconButton(
+            tooltip: 'Brechas de datos (API)',
+            icon: const Icon(Icons.public),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const BreachesScreen()),
+            ),
+          ),
           const _OutboxButton(),
           IconButton(
             tooltip: 'Probar notificación',
