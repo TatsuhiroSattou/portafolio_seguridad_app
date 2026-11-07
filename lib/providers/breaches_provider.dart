@@ -6,6 +6,9 @@ import '../services/breach_service.dart';
 /// Los tres estados de la petición que dibuja la interfaz.
 enum BreachesStatus { loading, success, error }
 
+/// Criterios de orden de la lista.
+enum BreachSort { recent, mostAccounts }
+
 /// Gestiona el estado de la consulta a la API con Provider.
 ///
 /// La pantalla solo observa este objeto: no sabe nada de HTTP ni de JSON.
@@ -28,6 +31,9 @@ class BreachesProvider extends ChangeNotifier {
   BreachException? _error;
   DateTime? _lastUpdated;
   bool _disposed = false;
+  String _query = '';
+  BreachSort _sort = BreachSort.recent;
+  bool? _online;
 
   BreachesStatus get status => _status;
   BreachException? get error => _error;
@@ -36,13 +42,53 @@ class BreachesProvider extends ChangeNotifier {
   /// Total de brechas descargadas (sin filtros).
   int get total => _all.length;
 
-  /// Lista que ve el usuario: las brechas más recientes primero.
-  List<Breach> get visible => _all;
+  String get query => _query;
+  BreachSort get sort => _sort;
+
+  /// Lista que ve el usuario: filtrada por la búsqueda y ordenada.
+  List<Breach> get visible {
+    final text = _query.trim().toLowerCase();
+    final list = text.isEmpty
+        ? List<Breach>.of(_all)
+        : _all.where((breach) {
+            return breach.title.toLowerCase().contains(text) ||
+                breach.domain.toLowerCase().contains(text) ||
+                breach.dataClasses
+                    .any((data) => data.toLowerCase().contains(text));
+          }).toList();
+    list.sort(
+      _sort == BreachSort.recent
+          ? _byRecent
+          : (a, b) => b.pwnCount.compareTo(a.pwnCount),
+    );
+    return list;
+  }
+
+  void setQuery(String value) {
+    _query = value;
+    _notify();
+  }
+
+  void setSort(BreachSort value) {
+    _sort = value;
+    _notify();
+  }
+
+  /// Lo llama el ProxyProvider cuando cambia la red: si había un error y
+  /// vuelve el internet, reintenta solo.
+  void updateConnectivity(bool online) {
+    final wasOnline = _online;
+    _online = online;
+    if (online && wasOnline == false && _status == BreachesStatus.error) {
+      Future.microtask(() => load());
+    }
+  }
 
   /// Carga inicial o reintento: pasa por el estado "Cargando".
   Future<void> load() async {
     _status = BreachesStatus.loading;
     _error = null;
+    _query = '';
     _notify();
 
     final minWait = Future<void>.delayed(minLoadingTime);

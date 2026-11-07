@@ -5,6 +5,7 @@ import '../core/app_theme.dart';
 import '../providers/breaches_provider.dart';
 import '../services/breach_service.dart';
 import '../widgets/breach_card.dart';
+import '../widgets/breach_detail_sheet.dart';
 
 /// Pantalla de resultados: muestra las filtraciones de datos que devuelve la
 /// API de Have I Been Pwned. Dibuja uno de los tres estados del provider:
@@ -38,6 +39,22 @@ class BreachesScreen extends StatelessWidget {
         backgroundColor: AppColors.background,
         foregroundColor: AppColors.primary,
         actions: [
+          PopupMenuButton<BreachSort>(
+            tooltip: 'Ordenar',
+            icon: const Icon(Icons.sort),
+            initialValue: provider.sort,
+            onSelected: provider.setSort,
+            itemBuilder: (context) => const [
+              PopupMenuItem(
+                value: BreachSort.recent,
+                child: Text('Más recientes'),
+              ),
+              PopupMenuItem(
+                value: BreachSort.mostAccounts,
+                child: Text('Más cuentas afectadas'),
+              ),
+            ],
+          ),
         ],
       ),
       body: switch (provider.status) {
@@ -141,6 +158,23 @@ class _SuccessView extends StatelessWidget {
 
     return Column(
       children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+          child: TextField(
+            onChanged: provider.setQuery,
+            decoration: InputDecoration(
+              hintText: 'Buscar por nombre, dominio o tipo de dato',
+              prefixIcon: const Icon(Icons.search),
+              filled: true,
+              fillColor: AppColors.surface,
+              contentPadding: const EdgeInsets.symmetric(vertical: 0),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: AppColors.border),
+              ),
+            ),
+          ),
+        ),
         _SummaryHeader(
           shown: items.length,
           total: provider.total,
@@ -170,6 +204,7 @@ class _SuccessView extends StatelessWidget {
                       final breach = items[index];
                       return BreachCard(
                         breach: breach,
+                        onTap: () => showBreachDetail(context, breach),
                       );
                     },
                   ),

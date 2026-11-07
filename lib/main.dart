@@ -84,9 +84,15 @@ class BugTatsuApp extends StatelessWidget {
           create: (_) => BreachService(),
           dispose: (_, service) => service.dispose(),
         ),
-        ChangeNotifierProvider<BreachesProvider>(
+        ChangeNotifierProxyProvider<ConnectivityProvider, BreachesProvider>(
           create: (context) =>
               BreachesProvider(context.read<BreachService>())..load(),
+          update: (context, connectivity, breaches) {
+            breaches!.updateConnectivity(
+              connectivity.isReady && connectivity.isOnline,
+            );
+            return breaches;
+          },
         ),
       ],
       child: _buildApp(),
