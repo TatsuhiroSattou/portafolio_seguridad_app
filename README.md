@@ -2,7 +2,7 @@
 
 Aplicación móvil en Flutter de **BugTatsu Sec**, la versión móvil de mi portafolio de ciberseguridad ofensiva ([portafolio.bugtatsu.xyz](https://portafolio.bugtatsu.xyz)). Muestra reportes de seguridad en formato de catálogo, únicamente con información pública y de alto nivel (sin pasos de reproducción), siguiendo la práctica de divulgación responsable.
 
-Es la evolución de la Actividad Integradora 1 (*Security Portfolio*): se aplicó un rebranding completo y se agregaron servicios nativos.
+Es la evolución de la Actividad Integradora 1 (*Security Portfolio*): se aplicó un rebranding completo, se agregaron servicios nativos y, en la Actividad 3, se integró una **API REST pública** con tres estados de interfaz (cargando, éxito y error).
 
 ## Identidad del proyecto
 
@@ -26,6 +26,52 @@ Icono y *splash screen* propios generados desde `assets/branding/` con `flutter_
 | Recorte y compresión | La foto se recorta en cuadrado y se comprime a JPEG en un *isolate* (sin congelar la interfaz). | [`image_service.dart`](lib/services/image_service.dart) |
 | Notificaciones locales | Canal nativo de Android y soporte iOS para alertas locales. | [`notification_service.dart`](lib/services/notification_service.dart) |
 | Eventos del sistema | Cambios de red, envíos y evidencias disparan notificaciones sin acoplar los módulos. | [`system_events_coordinator.dart`](lib/services/system_events_coordinator.dart) |
+
+## API pública consumida (Actividad 3)
+
+La app consulta las filtraciones de datos conocidas de **[Have I Been Pwned](https://haveibeenpwned.com/api/v3)**, un tema directamente relacionado con la ciberseguridad ofensiva del portafolio.
+
+| | |
+|---|---|
+| API | Have I Been Pwned v3 (HIBP) |
+| Endpoint | `GET https://haveibeenpwned.com/api/v3/breaches` |
+| Autenticación | Ninguna (este endpoint es público). Solo exige la cabecera `User-Agent` |
+| Formato | Arreglo JSON con todas las brechas (≈ 1 MB) |
+| Campos usados | `Name`, `Title`, `Domain`, `BreachDate`, `AddedDate`, `PwnCount`, `Description`, `LogoPath`, `DataClasses`, `IsVerified`, `IsSensitive` |
+| Paquete HTTP | [`http`](https://pub.dev/packages/http) |
+| Estado | Provider (`BreachesProvider`) |
+
+Datos de HIBP bajo licencia CC BY 4.0: se cita la fuente en el detalle de cada brecha.
+
+**Cómo se llega a la pantalla:** botón del globo 🌐 en la barra superior de la pantalla de inicio.
+
+### Estados de la interfaz
+
+| Estado | Qué se ve |
+|---|---|
+| Cargando | Indicador circular con el texto "Consultando haveibeenpwned.com…" |
+| Éxito | Tarjetas con logo, fecha, cuentas afectadas y tipos de datos; buscador, orden y *pull-to-refresh* |
+| Error | Ícono y mensaje según la causa (sin internet, tiempo agotado, servidor) con botón **Reintentar**; también se reintenta solo cuando vuelve la conexión |
+
+### Flujo de datos
+
+```mermaid
+flowchart LR
+  UI["BreachesScreen"] -->|"context.watch"| P["BreachesProvider"]
+  P -->|"fetchBreaches()"| S["BreachService (http)"]
+  S -->|"GET /breaches"| API[("haveibeenpwned.com")]
+  S -->|"compute: parseBreaches"| M["Breach.fromJson"]
+  M --> P
+  P -->|"loading / success / error"| UI
+```
+
+### Pruebas automáticas
+
+```bash
+flutter test
+```
+
+Verifican el mapeo JSON → modelo (`fromJson` / `toJson`), el análisis de la respuesta y los estados del provider.
 
 ## Arquitectura
 
@@ -80,11 +126,11 @@ flowchart TB
 | Carpeta | Contenido |
 |---|---|
 | [`lib/core/`](lib/core) | Tema y paleta de la marca |
-| [`lib/models/`](lib/models) | Modelos de datos (`SecurityReport`, `ContactRequest`) |
+| [`lib/models/`](lib/models) | Modelos de datos (`SecurityReport`, `ContactRequest`, `Breach`) |
 | [`lib/screens/`](lib/screens) | Pantallas (inicio, detalle, evidencia, solicitudes) |
 | [`lib/widgets/`](lib/widgets) | Componentes reutilizables (tarjeta, chip, banner offline) |
 | [`lib/providers/`](lib/providers) | Estado con Provider |
-| [`lib/services/`](lib/services) | Servicios nativos: red, permisos, imagen y notificaciones |
+| [`lib/services/`](lib/services) | Servicios: red, permisos, imagen, notificaciones y cliente HTTP de la API (`breach_service.dart`) |
 | [`lib/repositories/`](lib/repositories) | Persistencia local con `shared_preferences` |
 | [`assets/`](assets) | Imágenes de los reportes y recursos de marca |
 | [`docs/`](docs) | Informe técnico (PDF) y diagrama de arquitectura |
@@ -102,6 +148,8 @@ dart run flutter_native_splash:create
 flutter run
 ```
 
+> La pantalla de brechas necesita internet. Sin conexión muestra el estado de error y se recupera sola al volver la red.
+>
 > En Android 13 o superior la app pide el permiso de notificaciones al abrirse. En Android, el permiso de cámara se solicita al pulsar **Tomar foto**.
 
 ## Ramas y flujo de trabajo
@@ -114,12 +162,13 @@ flutter run
 | `feature/offline-cache` | Caché local de solicitudes |
 | `feature/camera-permissions` | Cámara, galería, permisos, recorte y compresión |
 | `feature/notifications` | Notificaciones locales y eventos del sistema |
+| `feature/api-integration` | Consumo de la API pública (HTTP, modelo JSON, Provider y pantalla de resultados) |
 
-Cada `feature/*` se fusiona en `develop` con `--no-ff`, y `develop` se fusiona en `main` al terminar.
+Cada `feature/*` se fusiona en `develop` con `--no-ff`, y `develop` se fusiona en `main` al terminar (versiones etiquetadas `v2.0.0` y `v3.0.0`).
 
 ## Documentación
 
-Informe técnico completo en [`docs/`](docs): rebranding, arquitectura, explicación de código, pruebas y conclusiones.
+Informes técnicos en [`docs/`](docs): Actividad 2 (rebranding y servicios nativos) y Actividad 3 (consumo de la API).
 
 ## Integrantes
 
