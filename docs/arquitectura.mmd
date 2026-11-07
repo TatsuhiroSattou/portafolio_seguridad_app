@@ -1,0 +1,62 @@
+flowchart TB
+  subgraph UI["Capa de presentación"]
+    direction LR
+    H["HomeScreen"]
+    D["DetailScreen"]
+    E["EvidenceScreen"]
+    O["OutboxScreen"]
+    B["OfflineBannerHost"]
+  end
+  subgraph ST["Gestión de estado (Provider)"]
+    direction LR
+    CP["ConnectivityProvider"]
+    RP["RequestsProvider"]
+    EP["EvidenceProvider"]
+  end
+  SYS["SystemEventsCoordinator"]
+  subgraph SV["Servicios nativos (sin UI)"]
+    direction LR
+    CS["ConnectivityService"]
+    PS["PermissionService"]
+    IS["ImageService"]
+    NS["NotificationService"]
+  end
+  subgraph DT["Capa de datos (caché local)"]
+    direction LR
+    RR["RequestsRepository"]
+    ER["EvidenceRepository"]
+    SP[("SharedPreferences")]
+  end
+  subgraph PL["Plugins y sistema operativo"]
+    direction LR
+    P1["connectivity_plus"]
+    P2["permission_handler"]
+    P3["image_picker"]
+    P4["flutter_local_notifications"]
+  end
+  UI --> ST
+  CP --> CS
+  EP --> PS
+  EP --> IS
+  RP --> RR
+  EP --> ER
+  RR --> SP
+  ER --> SP
+  CS --> P1
+  PS --> P2
+  IS --> P3
+  NS --> P4
+  CP -. "escucha cambios" .-> SYS
+  SYS --> NS
+  RP -. "onSynced" .-> NS
+  EP -. "onEvidenceReady" .-> NS
+  classDef ui fill:#e0f2fe,stroke:#0284c7,color:#0c4a6e;
+  classDef st fill:#ede9fe,stroke:#7c3aed,color:#3b0764;
+  classDef sv fill:#dcfce7,stroke:#16a34a,color:#14532d;
+  classDef dt fill:#fef3c7,stroke:#d97706,color:#78350f;
+  classDef pl fill:#f1f5f9,stroke:#64748b,color:#0f172a;
+  class H,D,E,O,B ui;
+  class CP,RP,EP,SYS st;
+  class CS,PS,IS,NS sv;
+  class RR,ER,SP dt;
+  class P1,P2,P3,P4 pl;
