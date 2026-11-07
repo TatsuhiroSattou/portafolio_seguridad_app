@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../core/app_theme.dart';
 import '../models/security_report.dart';
+import '../providers/requests_provider.dart';
 import '../widgets/severity_chip.dart';
 
 /// Pantalla 2: detalle del reporte y formulario de contacto.
@@ -38,10 +40,20 @@ class _DetailScreenState extends State<DetailScreen> {
     final name = _nameController.text.trim();
     final report = widget.report;
 
-    // Regresa a la Pantalla 1 devolviendo un mensaje (vuelta).
+    // Guarda la solicitud en el dispositivo y la envía si hay conexión.
+    final sent = await context.read<RequestsProvider>().submit(
+          reportId: report.id,
+          organization: report.organization,
+          name: name,
+          reason: _reason,
+        );
+    if (!mounted) return;
+
     Navigator.pop(
       context,
-      'Solicitud de $name ($_reason) sobre el reporte de ${report.organization}.',
+      sent
+          ? 'Solicitud enviada: $name ($_reason) sobre ${report.organization}.'
+          : 'Sin conexión: tu solicitud quedó guardada y se enviará al reconectar.',
     );
   }
 
