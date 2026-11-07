@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'core/app_theme.dart';
+import 'providers/breaches_provider.dart';
 import 'providers/connectivity_provider.dart';
 import 'providers/evidence_provider.dart';
 import 'providers/requests_provider.dart';
 import 'repositories/requests_repository.dart';
 import 'repositories/evidence_repository.dart';
 import 'screens/home_screen.dart';
+import 'services/breach_service.dart';
 import 'services/connectivity_service.dart';
 import 'services/image_service.dart';
 import 'services/notification_service.dart';
@@ -77,6 +79,14 @@ class BugTatsuApp extends StatelessWidget {
               body: message,
             ),
           ),
+        ),
+        Provider<BreachService>(
+          create: (_) => BreachService(),
+          dispose: (_, service) => service.dispose(),
+        ),
+        ChangeNotifierProvider<BreachesProvider>(
+          create: (context) =>
+              BreachesProvider(context.read<BreachService>())..load(),
         ),
       ],
       child: _buildApp(),
